@@ -58,9 +58,9 @@ class CN:
 		
 		
 
-#==================================================
-# Conversion to Polar Notation (Auxiliar Functions)
-#==================================================
+#==========
+# Converter
+#==========
 		
 	#Gives back the radius of the complex number
 	def abs(self):
@@ -84,6 +84,17 @@ class CN:
 	@staticmethod
 	def phiInDegrees(x):
 		return math.degrees(x)
+		
+	#unkown curater - it takes x and sees if it is of the class CNPolar or a number and then transforms it to a CN object
+	@staticmethod	
+	def ucurate(x):
+		if isinstance(x, CNPolar):
+			x = x.toalg()
+		elif not isinstance(x, CN):
+			x = CN(x)
+			
+		return x
+		
 
 		
 		
@@ -93,14 +104,25 @@ class CN:
 #=============================================
 #These functions also allow to work with a complex number and a number of the real domain.	
 	
-	#Add to a complex number	def add(self, c2):		x = CN()		try:			x.setRe(self.getRe() + c2.getRe())			x.setIm(self.getIm() + c2.getIm())		except:			x.setRe(self.getRe() + c2)			x.setIm(self.getIm())		return x
+	#Add to a complex number	def add(self, c2):		x = CN()
+		c2 = CN.ucurate(c2)
+				x.setRe(self.getRe() + c2.getRe())		x.setIm(self.getIm() + c2.getIm())		
+				return x
 
-	#Substract from a complex number	def sub(self, c2):		try:			return self.add(-c2)		except:			return self.add(c2.signswap())
+	#Substract from a complex number	def sub(self, c2):		
+		c2 = CN.ucurate(c2)		
+		return self.add(c2.signswap())
 
-	#Multiply a complex number	def mul(self, c2):		x = CN()		try:			x.setRe((self.getRe() * c2.getRe()) - (self.getIm() * c2.getIm()))			x.setIm((self.getRe() * c2.getIm()) + (self.getIm() * c2.getRe()))		except:			h = CN(c2)			x.setRe((self.getRe() * h.getRe()) - (self.getIm() * h.getIm()))			x.setIm((self.getRe() * h.getIm()) + (self.getIm() * h.getRe()))
-		return x
+	#Multiply a complex number	def mul(self, c2):		x = CN()
+				c2 = CN.ucurate(c2)		
+		x.setRe((self.getRe() * c2.getRe()) - (self.getIm() * c2.getIm()))		x.setIm((self.getRe() * c2.getIm()) + (self.getIm() * c2.getRe()))				return x
 
-	#Divided a complex number	def div(self, c2):		x = CN()		try:			x.setRe(((self.getRe() * c2.getRe()) + (self.getIm() * c2.getIm()))/(c2.getRe()**2 + c2.getIm()**2))			x.setIm(((self.getIm() * c2.getRe()) - (self.getRe() * c2.getIm()))/(c2.getRe()**2 + c2.getIm()**2))		except:			h = CN(c2)			x.setRe(((self.getRe() * h.getRe()) + (self.getIm() * h.getIm()))/(h.getRe()**2 + h.getIm()**2))			x.setIm(((self.getIm() * h.getRe()) - (self.getRe() * h.getIm()))/(h.getRe()**2 + h.getIm()**2))		return x
+	#Divided a complex number	def div(self, c2):		x = CN()
+		
+		c2 = CN.ucurate(c2)
+				x.setRe(((self.getRe() * c2.getRe()) + (self.getIm() * c2.getIm()))/(c2.getRe()**2 + c2.getIm()**2))		x.setIm(((self.getIm() * c2.getRe()) - (self.getRe() * c2.getIm()))/(c2.getRe()**2 + c2.getIm()**2))
+			
+					return x
 
 		
 		
@@ -245,6 +267,9 @@ class CNPolar:
 			
 		return x
 		
+	#Multiplies -1, the inverse element of the multiplication in complex numbers
+	def signswap(self):
+		return self.mul(-1)
 		
 #==========
 # Converter
@@ -254,6 +279,70 @@ class CNPolar:
 	def toalg(self):
 		phi = math.radians(self.getPhi())
 		return CN(self.getR() * math.cos(phi), self.getR() * math.sin(phi))
+	
+	#unkown curater - it takes x and sees if it is of the class CN or a number and then transforms it to a CNPolar object
+	@staticmethod	
+	def ucurate(x):
+		if isinstance(x, CN):
+			x = x.topolar()
+		elif not isinstance(x, CNPolar):
+			x = CNPolar(x)
+			
+		return x
+		
+		
+#========================================
+# Arithmetic Operations in Polar Notation
+#========================================
+#These functions also allow to work with a complex number and a number of the real domain.	
+	
+	#Add to a complex number
+	def add(self, c2):
+		x = CNPolar()
+			
+		c2 = CNPolar.ucurate(c2)	
+			
+		r = self.getR()
+		phi = math.radians(self.getPhi())
+		
+		s = c2.getR()
+		psi = math.radians(c2.getPhi())
+			
+		t = math.sqrt(r*r + s*s + 2 * r * s * math.cos(phi-psi))
+		chi = math.degrees(math.atan2(r * math.sin(phi) + s * math.sin(psi), r * math.cos(phi) + s * math.cos(psi)))
+		
+		x.setR(t)
+		x.setPhi(chi)
+		
+		return x
+		
+	#Substract from a complex number
+	def sub(self, c2):
+		c2 = CNPolar.ucurate(c2)
+		return self.add(c2.signswap())
+
+	def mul(self, c2):
+		x = CNPolar()
+		
+		c2 = CNPolar.ucurate(c2)
+		
+		x.setR(self.getR() * c2.getR())
+		x.setPhi(self.getPhi() + c2.getPhi())
+		
+		return x
+		
+		
+	def div(self, c2):
+		x = CNPolar()
+		
+		c2 = CNPolar.ucurate(c2)
+		
+		x.setR(self.getR() / c2.getR())
+		x.setPhi(self.getPhi() - c2.getPhi())
+		
+		return x
+		
+		
 		
 #========================
 # Mathematical Operations
