@@ -220,7 +220,7 @@ class CNPolar:
 			phi = str(math.radians(phi))
 			
 		r = str(self.getR())
-		print("Phi = " + phi + "; r = " + r)
+		print("r = " + r + "; Phi = " + phi)
 
 	#In the trigonometric form either with cis or with cos and sin * i. Default it is with cos and sin * i.
 	def printtrig(self, deg = True, cis = False):
